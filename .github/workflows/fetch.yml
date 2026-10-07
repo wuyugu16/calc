@@ -1,0 +1,56 @@
+name: Fetch web.txt URL
+
+on:
+  push:
+    branches:
+      - "**"
+    # 避免把 1.out 自己的提交再次触发，形成死循环
+    paths-ignore:
+      - "1.out"
+
+# 需要写权限才能把 1.out 提交回仓库
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Read URL from web.txt
+        id: read
+        run: |
+          if [ ! -f web.txt ]; then
+            echo "::error::web.txt 不存在"
+            exit 1
+          fi
+          # 取第一行并去掉首尾空白/回车符
+          URL=$(head -n 1 web.txt | tr -d '\r' | xargs)
+          if [ -z "$URL" ]; then
+            echo "::error::web.txt 内容为空"
+            exit 1
+          fi
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "将访问: $URL"
+
+      - name: Fetch URL and save to 1.out
+        run: |
+          curl -sSL --fail --retry 3 --max-time 60 \
+            "${{ steps.read.outputs.url }}" -o 1.out
+          echo "已保存，大小: $(wc -c < 1.out) 字节"
+
+      - name: Commit 1.out
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add 1.out
+          # 内容没变就不提交
+          if git diff --staged --quiet; then
+            echo "1.out 无变化，跳过提交"
+          else
+            git commit -m "chore: update 1.out [skip ci]"
+            git push
+          fi
