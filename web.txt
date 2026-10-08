@@ -1,2 +1,1 @@
-www.wikipedia.org/portal/wikipedia.org/assets/js/index-a9b103e1fc.js
-www.wikipedia.org/portal/wikipedia.org/assets/js/gt-ie9-507b16b6be.js
+www.wikipedia.org/search-redirect.php?q=%e5%a4%a9%e5%ae%89%e9%97%a8%e4%ba%8b%e4%bb%b6
