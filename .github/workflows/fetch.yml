@@ -46,7 +46,7 @@ jobs:
             case "$url" in \#*) continue ;; esac
 
             idx=$((idx + 1))
-            out="${OUTDIR}/Line${idx}.out"
+            out="out/${OUTDIR}/Line${idx}.out"
             echo "[$idx] $url -> $out"
 
             if ! curl -sSL --fail --retry 3 --max-time 60 "$url" -o "$out"; then
